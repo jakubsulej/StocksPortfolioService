@@ -10,7 +10,7 @@ public class ApplicationTestFixture : IAsyncLifetime
     public TestServer? TestServer { get; private set; }
     public MongoDbContainer MongoDbContainer { get; private set; }
     public IMongoClient MongoClient { get; private set; }
-    public string MongoDbName => "portfolioServiceDb";
+    public string MongoDbName = "portfolioServiceDb";
 
     public ApplicationTestFixture()
     {
