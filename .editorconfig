@@ -1,0 +1,14 @@
+root = true
+
+# All files
+[*]
+indent_style = space
+
+# Xml files
+[*.xml]
+indent_size = 2
+
+[*.cs]
+
+# Require private fields to begin with an underscore (_).
+dotnet_naming_style.instance_field_style.required_prefix = _

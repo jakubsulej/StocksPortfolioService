@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.TestHost;
-using MongoDB.Bson;
+﻿using MongoDB.Bson;
 using MongoDB.Driver;
 using StocksPortfolioService.Application.Queries.GetPortfolio;
 using StocksPortfolioService.Application.Queries.GetTotalPortfolioValue;
@@ -14,7 +13,6 @@ namespace StocksPortfolioService.Api.IntegrationTests.Controllers;
 [Collection(ApplicationTestCollection.Name)]
 public class StockControllerTests
 {
-    private readonly TestServer _testServer;
     private readonly HttpClient _httpClient;
     private readonly IMongoClient _mongoClient;
     private readonly string _mongoDbName;
@@ -22,7 +20,6 @@ public class StockControllerTests
 
     public StockControllerTests(ApplicationTestFixture applicationTestFixture)
     {
-        _testServer = applicationTestFixture.TestServer ?? throw new ArgumentNullException($"{nameof(applicationTestFixture.TestServer)} was null");
         _httpClient = applicationTestFixture.HttpClient ?? throw new ArgumentNullException($"{nameof(applicationTestFixture.HttpClient)} was null");
         _mongoClient = applicationTestFixture.MongoClient ?? throw new ArgumentNullException($"{nameof(applicationTestFixture.MongoClient)} was null");
         _mongoDbName = applicationTestFixture.MongoDbName ?? throw new ArgumentNullException($"{nameof(applicationTestFixture.MongoDbName)} was null");
