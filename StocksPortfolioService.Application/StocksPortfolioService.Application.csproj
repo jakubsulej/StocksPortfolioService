@@ -13,7 +13,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\StocksPortfolioService.Infrastructure\StocksPortfolioService.Infrastructure.csproj" />
+    <ProjectReference Include="..\StocksPortfolioService.Infrastructure.Adapters\StocksPortfolioService.Infrastructure.Adapters.csproj" />
+    <ProjectReference Include="..\StocksPortfolioService.Infrastructure.Database\StocksPortfolioService.Infrastructure.Database.csproj" />
   </ItemGroup>
 
 </Project>

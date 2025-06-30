@@ -1,15 +1,9 @@
 ﻿using Microsoft.Extensions.Options;
+using StocksPortfolioService.Infrastructure.Adapters.Abstractions.CurrencyLayer;
+using StocksPortfolioService.Infrastructure.Adapters.Configuration;
 using StocksPortfolioService.Infrastructure.Adapters.CurrencyLayer.Models;
-using StocksPortfolioService.Infrastructure.Configuration;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace StocksPortfolioService.Infrastructure.Adapters.CurrencyLayer;
-
-public interface ICurrencyLayerClient
-{
-    Task<GetLiveResponse> GetLiveAsync(CancellationToken cancellationToken);
-}
 
 internal class CurrencyLayerClient : ICurrencyLayerClient
 {

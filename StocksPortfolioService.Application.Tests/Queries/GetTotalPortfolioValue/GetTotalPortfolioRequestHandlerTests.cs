@@ -1,44 +1,45 @@
 ﻿using FakeItEasy;
 using MongoDB.Bson;
-using StocksPortfolioService.Application.Exceptions;
 using StocksPortfolioService.Application.Queries.GetTotalPortfolioValue;
 using StocksPortfolioService.Application.Services;
 using StocksPortfolioService.Domain.Consts;
-using StocksPortfolioService.Infrastructure.Models;
+using StocksPortfolioService.Domain.Exceptions;
+using StocksPortfolioService.Domain.Models;
+using StocksPortfolioService.Domain.Repositories;
 
 namespace StocksPortfolioService.Application.Tests.Queries.GetTotalPortfolioValue;
 
 public class GetTotalPortfolioRequestHandlerTests
 {
-    private readonly IPortfolioService _portfolioService = A.Fake<IPortfolioService>();
+    private readonly IPortfolioRepository _portfolioRepository = A.Fake<IPortfolioRepository>();
     private readonly IStockService _stockService = A.Fake<IStockService>();
     private readonly ICurrencyLayerService _currencyService = A.Fake<ICurrencyLayerService>();
     private readonly GetTotalPortfolioValueRequestHandler _sut;
 
     public GetTotalPortfolioRequestHandlerTests()
     {
-        _sut = new GetTotalPortfolioValueRequestHandler(_portfolioService, _stockService, _currencyService);
+        _sut = new GetTotalPortfolioValueRequestHandler(_portfolioRepository, _stockService, _currencyService);
     }
 
     [Fact]
     public async Task Returns_Correct_Total_When_All_Currencies_Are_USD()
     {
         // Arrange
-        var portfolioId = ObjectId.GenerateNewId();
+        var portfolioId = ObjectId.GenerateNewId().ToString();
         var currency = CurrencyConsts.USD;
         var ticker = "TSLA";
         var request = new GetTotalPortfolioValueRequest(portfolioId.ToString(), currency); ;
 
-        var portfolio = new PortfolioData
+        var portfolio = new Portfolio
         {
             Id = portfolioId,
             Stocks =
             [
-                new StockData { Ticker = ticker, BaseCurrency = currency, NumberOfShares = 2 }
+                new Stock { Ticker = ticker, BaseCurrency = currency, NumberOfShares = 2 }
             ]
         };
 
-        A.CallTo(() => _portfolioService.GetPortfolioById(portfolioId.ToString())).Returns(portfolio);
+        A.CallTo(() => _portfolioRepository.GetByIdAsync(portfolioId.ToString(), A<CancellationToken>._)).Returns(portfolio);
         A.CallTo(() => _stockService.GetCurrentStockPrice(ticker)).Returns(Task.FromResult((500m, CurrencyConsts.USD)));
         A.CallTo(() => _currencyService.GetCachedCurrencies(A<CancellationToken>._))
             .Returns(new Dictionary<string, decimal>
@@ -57,19 +58,19 @@ public class GetTotalPortfolioRequestHandlerTests
     public async Task Converts_To_USD_When_BaseCurrency_Is_Not_USD()
     {
         // Arrange
-        var portfolioId = ObjectId.GenerateNewId();
+        var portfolioId = ObjectId.GenerateNewId().ToString();
         var request = new GetTotalPortfolioValueRequest(portfolioId.ToString(), CurrencyConsts.USD);
 
-        var portfolio = new PortfolioData
+        var portfolio = new Portfolio
         {
             Id = portfolioId,
             Stocks =
             [
-                new StockData { Ticker = "TSLA", BaseCurrency = "EUR", NumberOfShares = 2 }
+                new Stock { Ticker = "TSLA", BaseCurrency = "EUR", NumberOfShares = 2 }
             ]
         };
 
-        A.CallTo(() => _portfolioService.GetPortfolioById(portfolioId.ToString())).Returns(portfolio);
+        A.CallTo(() => _portfolioRepository.GetByIdAsync(portfolioId.ToString(), A<CancellationToken>._)).Returns(portfolio);
         A.CallTo(() => _stockService.GetCurrentStockPrice("TSLA")).Returns(Task.FromResult((500m, "EUR")));
         A.CallTo(() => _currencyService.GetCachedCurrencies(A<CancellationToken>._))
             .Returns(new Dictionary<string, decimal>
@@ -90,19 +91,19 @@ public class GetTotalPortfolioRequestHandlerTests
     public async Task Converts_From_NonUsd_To_TargetCurrency()
     {
         // Arrange
-        var portfolioId = ObjectId.GenerateNewId();
+        var portfolioId = ObjectId.GenerateNewId().ToString();
         var request = new GetTotalPortfolioValueRequest(portfolioId.ToString(), "SEK");
 
-        var portfolio = new PortfolioData
+        var portfolio = new Portfolio
         {
             Id = portfolioId,
             Stocks =
             [
-                new StockData { Ticker = "GME", BaseCurrency = "EUR", NumberOfShares = 1 }
+                new Stock { Ticker = "GME", BaseCurrency = "EUR", NumberOfShares = 1 }
             ]
         };
 
-        A.CallTo(() => _portfolioService.GetPortfolioById(portfolioId.ToString())).Returns(portfolio);
+        A.CallTo(() => _portfolioRepository.GetByIdAsync(portfolioId.ToString(), A<CancellationToken>._)).Returns(portfolio);
         A.CallTo(() => _stockService.GetCurrentStockPrice("GME")).Returns(Task.FromResult((100m, "EUR")));
 
         A.CallTo(() => _currencyService.GetCachedCurrencies(A<CancellationToken>._))
@@ -125,10 +126,10 @@ public class GetTotalPortfolioRequestHandlerTests
     public async Task Throws_When_Portfolio_Not_Found()
     {
         // Arrange
-        var portfolioId = ObjectId.GenerateNewId();
+        var portfolioId = ObjectId.GenerateNewId().ToString();
         var request = new GetTotalPortfolioValueRequest(portfolioId.ToString(), CurrencyConsts.USD);
 
-        A.CallTo(() => _portfolioService.GetPortfolioById(portfolioId.ToString())).Returns<PortfolioData?>(null);
+        A.CallTo(() => _portfolioRepository.GetByIdAsync(portfolioId.ToString(), A<CancellationToken>._)).Returns<Portfolio?>(null);
 
         // Act & Assert
         await Assert.ThrowsAsync<EntityNotFoundException>(() =>

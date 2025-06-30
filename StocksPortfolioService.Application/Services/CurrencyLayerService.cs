@@ -1,15 +1,11 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
-using StocksPortfolioService.Infrastructure.Adapters.CurrencyLayer;
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
+using StocksPortfolioService.Infrastructure.Adapters.Abstractions.CurrencyLayer;
 
 namespace StocksPortfolioService.Application.Services;
 
 public interface ICurrencyLayerService
 {
-    Task<IDictionary<string, decimal>> GetCachedCurrencies(CancellationToken cancellationToken);
+    Task<IDictionary<string, decimal>?> GetCachedCurrencies(CancellationToken cancellationToken);
 }
 
 internal class CurrencyLayerService : ICurrencyLayerService
@@ -27,7 +23,7 @@ internal class CurrencyLayerService : ICurrencyLayerService
         _currencyLayerClient = currencyLayerClient;
     }
 
-    public async Task<IDictionary<string, decimal>> GetCachedCurrencies(CancellationToken cancellationToken) =>
+    public async Task<IDictionary<string, decimal>?> GetCachedCurrencies(CancellationToken cancellationToken) =>
         await _memoryCache.GetOrCreateAsync(nameof(GetCachedCurrencies), async entry =>
         {
             entry.AbsoluteExpirationRelativeToNow = _cacheExpirationTime;

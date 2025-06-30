@@ -2,7 +2,8 @@
 using MongoDB.Driver;
 using StocksPortfolioService.Application.Queries.GetPortfolio;
 using StocksPortfolioService.Application.Queries.GetTotalPortfolioValue;
-using StocksPortfolioService.Infrastructure.Models;
+using StocksPortfolioService.Domain.Models;
+using StocksPortfolioService.TestsCommon.Helpers;
 using StocksPortfolioService.TestsCommon.Http;
 using StocksPortfolioService.TestsCommon.Mongo;
 using System.Net;
@@ -30,8 +31,8 @@ public class StockControllerTests
     public async Task GetPortfolio_ShouldReturnCorrectPortfolio()
     {
         //Arrange
-        var id = new ObjectId("61377659d24fd78398a5a54a");
-        var testPortfolios = new List<PortfolioData>
+        var id = new ObjectId("61377659d24fd78398a5a54a").ToString();
+        var testPortfolios = new List<Portfolio>
         {
             new() 
             {
@@ -41,12 +42,12 @@ public class StockControllerTests
                 DeletedAt = null,
                 Stocks =
                 [
-                    new StockData { Ticker = "TSLA", BaseCurrency = "USD", NumberOfShares = 20 }
+                    new Stock { Ticker = "TSLA", BaseCurrency = "USD", NumberOfShares = 20 }
                 ]
             }
         };
 
-        var seeder = new MongoTestDataSeeder<PortfolioData>(_mongoClient, _mongoDbName, "Portfolios");
+        var seeder = new MongoTestDataSeeder<Portfolio>(_mongoClient, _mongoDbName, "Portfolios");
         await seeder.SeedAsync(testPortfolios);
 
         var request = HttpRequestMessageBuilder.BuildGet($"api/portfolio/{id}");
@@ -57,7 +58,7 @@ public class StockControllerTests
         //Assert
         await response.AssertStatusCode(HttpStatusCode.OK);
         var content = await response.Content.ReadAsStringAsync(_cancellationToken);
-        var responseAsModel = JsonSerializer.Deserialize<GetPortfolioResponse>(content);
+        var responseAsModel = JsonSerializer.Deserialize<GetPortfolioResponse>(content, JsonTestSerializerOptionsHelper.GetSerializerOptions());
         Assert.NotNull(responseAsModel);
     }
 
@@ -65,8 +66,9 @@ public class StockControllerTests
     public async Task GetTotalPortfolioValue_ShouldReturnTotalPortfolioValue_GivenMultiplePortfolioRecords()
     {
         //Arrange
-        var id = new ObjectId("61377659d24fd78398a5a54b");
-        var testPortfolios = new List<PortfolioData>
+        var id = new ObjectId("61377659d24fd78398a5a54b").ToString();
+        var currency = "USD";
+        var testPortfolios = new List<Portfolio>
         {
             new()
             {
@@ -76,17 +78,17 @@ public class StockControllerTests
                 DeletedAt = null,
                 Stocks =
                 [
-                    new StockData { Ticker = "TSLA", BaseCurrency = "USD", NumberOfShares = 20 },
-                    new StockData { Ticker = "GME", BaseCurrency = "USD", NumberOfShares = 5 },
-                    new StockData { Ticker = "NAS", BaseCurrency = "NOK", NumberOfShares = 7 },
+                    new Stock { Ticker = "TSLA", BaseCurrency = currency, NumberOfShares = 20 },
+                    new Stock { Ticker = "GME", BaseCurrency = currency, NumberOfShares = 5 },
+                    new Stock { Ticker = "NAS", BaseCurrency = currency, NumberOfShares = 7 },
                 ]
             }
         };
 
-        var seeder = new MongoTestDataSeeder<PortfolioData>(_mongoClient, _mongoDbName, "Portfolios");
+        var seeder = new MongoTestDataSeeder<Portfolio>(_mongoClient, _mongoDbName, "Portfolios");
         await seeder.SeedAsync(testPortfolios);
 
-        var request = HttpRequestMessageBuilder.BuildGet($"/value?portfolioId={id}");
+        var request = HttpRequestMessageBuilder.BuildGet($"api/portfolio/{id}/{currency}/total-value");
 
         //Act
         var response = await _httpClient.SendAsync(request, _cancellationToken);
@@ -94,7 +96,7 @@ public class StockControllerTests
         //Assert
         await response.AssertStatusCode(HttpStatusCode.OK);
         var content = await response.Content.ReadAsStringAsync(_cancellationToken);
-        var responseAsModel = JsonSerializer.Deserialize<GetTotalPortfolioValueResponse>(content);
+        var responseAsModel = JsonSerializer.Deserialize<GetTotalPortfolioValueResponse>(content, JsonTestSerializerOptionsHelper.GetSerializerOptions());
         Assert.NotNull(responseAsModel);
     }
 
@@ -102,8 +104,8 @@ public class StockControllerTests
     public async Task DeletePortfolio_ShouldSoftDeleteRecord_GivenNonDeletedData()
     {
         //Arrange
-        var id = new ObjectId("61377659d24fd78398a5a54c");
-        var testPortfolios = new List<PortfolioData>
+        var id = new ObjectId("61377659d24fd78398a5a54c").ToString();
+        var testPortfolios = new List<Portfolio>
         {
             new()
             {
@@ -113,15 +115,15 @@ public class StockControllerTests
                 DeletedAt = null,
                 Stocks =
                 [
-                    new StockData { Ticker = "TSLA", BaseCurrency = "USD", NumberOfShares = 20 }
+                    new Stock { Ticker = "TSLA", BaseCurrency = "USD", NumberOfShares = 20 }
                 ]
             }
         };
 
-        var seeder = new MongoTestDataSeeder<PortfolioData>(_mongoClient, _mongoDbName, "Portfolios");
+        var seeder = new MongoTestDataSeeder<Portfolio>(_mongoClient, _mongoDbName, "Portfolios");
         await seeder.SeedAsync(testPortfolios);
 
-        var request = HttpRequestMessageBuilder.BuildGet($"/delete?portfolioId={id}");
+        var request = HttpRequestMessageBuilder.BuildDelete($"api/portfolio/{id}");
 
         //Act
         var response = await _httpClient.SendAsync(request, _cancellationToken);

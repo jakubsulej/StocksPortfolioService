@@ -1,12 +1,9 @@
 ﻿using MediatR;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using StocksPortfolioService.Api.Helpers;
 using StocksPortfolioService.Application.Commands.DeletePortfolio;
 using StocksPortfolioService.Application.Queries.GetPortfolio;
 using StocksPortfolioService.Application.Queries.GetTotalPortfolioValue;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace StocksPortfolioService.Api.Controllers;
 

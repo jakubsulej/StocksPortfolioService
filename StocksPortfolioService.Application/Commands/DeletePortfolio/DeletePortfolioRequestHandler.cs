@@ -1,22 +1,20 @@
 ﻿using MediatR;
-using StocksPortfolioService.Application.Services;
-using System.Threading;
-using System.Threading.Tasks;
+using StocksPortfolioService.Domain.Repositories;
 
 namespace StocksPortfolioService.Application.Commands.DeletePortfolio;
 
 internal class DeletePortfolioRequestHandler : IRequestHandler<DeletePortfolioRequest, DeletePortfolioResponse>
 {
-    private readonly IPortfolioService _portfolioService;
+    private readonly IPortfolioRepository _portfolioRepository;
 
-    public DeletePortfolioRequestHandler(IPortfolioService portfolioService)
+    public DeletePortfolioRequestHandler(IPortfolioRepository portfolioRepository)
     {
-        _portfolioService = portfolioService;
+        _portfolioRepository = portfolioRepository;
     }
 
     public async Task<DeletePortfolioResponse> Handle(DeletePortfolioRequest request, CancellationToken cancellationToken)
     {
-        await _portfolioService.DeletePortfolio(request.Id);
+        await _portfolioRepository.DeleteByIdAsync(request.Id, cancellationToken);
         return new DeletePortfolioResponse();
     }
 }

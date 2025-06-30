@@ -1,24 +1,23 @@
 ﻿using MediatR;
-using StocksPortfolioService.Application.Exceptions;
 using StocksPortfolioService.Application.Services;
 using StocksPortfolioService.Domain.Consts;
-using System.Threading;
-using System.Threading.Tasks;
+using StocksPortfolioService.Domain.Exceptions;
+using StocksPortfolioService.Domain.Repositories;
 
 namespace StocksPortfolioService.Application.Queries.GetTotalPortfolioValue;
 
 public class GetTotalPortfolioValueRequestHandler : IRequestHandler<GetTotalPortfolioValueRequest, GetTotalPortfolioValueResponse>
 {
-    private readonly IPortfolioService _portfolioService;
+    private readonly IPortfolioRepository _portfolioRepository;
     private readonly IStockService _stockService;
     private readonly ICurrencyLayerService _currencyLayerService;
 
     public GetTotalPortfolioValueRequestHandler(
-        IPortfolioService portfolioService,
+        IPortfolioRepository portfolioRepository,
         IStockService stockService, 
         ICurrencyLayerService currencyLayerService)
     {
-        _portfolioService = portfolioService;
+        _portfolioRepository = portfolioRepository;
         _stockService = stockService;
         _currencyLayerService = currencyLayerService;
     }
@@ -26,7 +25,7 @@ public class GetTotalPortfolioValueRequestHandler : IRequestHandler<GetTotalPort
     public async Task<GetTotalPortfolioValueResponse> Handle(GetTotalPortfolioValueRequest request, CancellationToken cancellationToken)
     {
         var targetCurrency = request.Currency;
-        var portfolio = await _portfolioService.GetPortfolioById(request.Id)
+        var portfolio = await _portfolioRepository.GetByIdAsync(request.Id, cancellationToken)
             ?? throw new EntityNotFoundException($"Portfolio with id {request.Id} was not found");
 
         var currencies = await _currencyLayerService.GetCachedCurrencies(cancellationToken)

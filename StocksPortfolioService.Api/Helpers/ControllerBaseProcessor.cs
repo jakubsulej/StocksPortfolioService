@@ -1,10 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using StocksPortfolioService.Application.Exceptions;
-using System;
+using StocksPortfolioService.Domain.Exceptions;
 using System.Net;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace StocksPortfolioService.Api.Helpers;
 

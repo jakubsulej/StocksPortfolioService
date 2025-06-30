@@ -1,11 +1,10 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using System;
-using System.Collections.Generic;
+using StocksPortfolioService.Infrastructure.Models;
 
-namespace StocksPortfolioService.Infrastructure.Models;
+namespace StocksPortfolioService.Infrastructure.Database.Models;
 
-public class PortfolioData
+public class PortfolioData : IEntity
 {
     [BsonElement("id")]
     public ObjectId Id { get; set; }
@@ -20,7 +19,7 @@ public class PortfolioData
     public DateTime? DeletedAt { get; set; }
 
     [BsonElement("stocks")]
-    public ICollection<StockData> Stocks { get; set; }
+    public ICollection<StockData> Stocks { get; set; } = [];
 }
 
 public class StockData

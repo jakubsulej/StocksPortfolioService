@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace StocksPortfolioService.Application.Exceptions;
+﻿namespace StocksPortfolioService.Domain.Exceptions;
 
 public class EntityNotFoundException : ArgumentNullException
 {

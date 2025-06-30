@@ -1,24 +1,22 @@
 ﻿using MediatR;
-using StocksPortfolioService.Application.Exceptions;
 using StocksPortfolioService.Application.Services;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
+using StocksPortfolioService.Domain.Exceptions;
+using StocksPortfolioService.Domain.Repositories;
 
 namespace StocksPortfolioService.Application.Queries.GetPortfolio;
 
 internal class GetPortfolioRequestHandler : IRequestHandler<GetPortfolioRequest, GetPortfolioResponse>
 {
-    private readonly IPortfolioService _portfolioService;
+    private readonly IPortfolioRepository _portfolioRepostory;
 
-    public GetPortfolioRequestHandler(IPortfolioService portfolioService)
+    public GetPortfolioRequestHandler(IPortfolioRepository portfolioRepository)
     {
-        _portfolioService = portfolioService;
+        _portfolioRepostory = portfolioRepository;
     }
 
     public async Task<GetPortfolioResponse> Handle(GetPortfolioRequest request, CancellationToken cancellationToken)
     {
-        var portfolio = await _portfolioService.GetPortfolioById(request.Id)
+        var portfolio = await _portfolioRepostory.GetByIdAsync(request.Id, cancellationToken)
             ?? throw new EntityNotFoundException($"Portfolio with id {request.Id} was not found");
 
         return new GetPortfolioResponse

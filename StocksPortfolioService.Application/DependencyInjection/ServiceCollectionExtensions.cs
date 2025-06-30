@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using StocksPortfolioService.Application.Services;
-using StocksPortfolioService.Infrastructure.DependencyInjection;
-using System;
+using StocksPortfolioService.Infrastructure.Adapters.DependencyInjection;
+using StocksPortfolioService.Infrastructure.Database.DependencyInjection;
 
 namespace StocksPortfolioService.Application.DependencyInjection;
 
@@ -11,6 +11,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration configuration)
     {
         return services
+            .AddDatabaseServices(configuration)
             .AddCQRSServices()
             .AddMemoryCache()
             .AddTransientServices()
@@ -29,8 +30,7 @@ public static class ServiceCollectionExtensions
     {
         services
             .AddTransient<IStockService, StockService>()
-            .AddTransient<ICurrencyLayerService, CurrencyLayerService>()
-            .AddTransient<IPortfolioService, PortfolioService>();
+            .AddTransient<ICurrencyLayerService, CurrencyLayerService>();
 
         return services;
     }

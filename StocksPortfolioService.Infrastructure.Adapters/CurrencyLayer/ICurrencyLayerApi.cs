@@ -1,7 +1,5 @@
 ﻿using Refit;
 using StocksPortfolioService.Infrastructure.Adapters.CurrencyLayer.Models;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace StocksPortfolioService.Infrastructure.Adapters.CurrencyLayer;
 
