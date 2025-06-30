@@ -1,12 +1,3 @@
-- [Features](#features)
-- [Architecture](#architecture)
-- [Tech Stack](#tech-stack)
-- [Getting Started](#getting-started)
-- [Testing](#testing)
-- [Project Structure](#project-structure)
-- [Contributing](#contributing)
-- [License](#license)
-
 ## ✨ Features
 - 🔁 Live currency conversion using CurrencyLayer API
 - 🧠 Domain-centric design following Hexagonal Architecture (Ports & Adapters)
@@ -17,9 +8,7 @@
 - 🧰 Clean separation of concerns (Domain, App, Infra, API)
 
 ## 🧱 Architecture
-
 This service follows the **Hexagonal Architecture (Clean Architecture)** pattern:
-
 - **Domain Layer**: Pure business logic, no framework dependencies.
 - **Application Layer**: Use case coordination, service interfaces.
 - **Infrastructure Layer**: MongoDB, HTTP clients, external services.
